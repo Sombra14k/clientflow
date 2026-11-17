@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Entrar{% endblock %}
+{% block body %}
+<div class="login">
+  <section class="login-side">
+    <div class="brand"><span class="brand-mark">C</span> ClientFlow</div>
+    <h1>Clientes e agenda sob controle.</h1>
+    <p>Cadastre contatos, organize a agenda de atendimentos e exporte tudo para Excel quando precisar.</p>
+  </section>
+  <section class="login-card">
+    <h2>Acessar o sistema</h2>
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in msgs %}<div class="flash {{ cat }}" role="status">{{ msg }}</div>{% endfor %}
+    {% endwith %}
+    <form method="post" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label>E-mail<input type="email" name="email" required autofocus autocomplete="username"></label>
+      <label>Senha<input type="password" name="password" required autocomplete="current-password"></label>
+      <button class="btn primary" type="submit">Entrar</button>
+    </form>
+    <div class="divider"><span>ou</span></div>
+    <form method="post" action="{{ url_for('auth.demo_login') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button class="btn demo" type="submit">Entrar com conta de demonstração</button>
+    </form>
+    <p class="hint">Conta de teste: <b>{{ demo_email }}</b> / <b>demo1234</b></p>
+  </section>
+</div>
+{% endblock %}

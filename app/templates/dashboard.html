@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Visão geral{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div><h1>Visão geral</h1><p class="sub">Resumo da carteira de clientes e da agenda.</p></div>
+  <div class="actions">
+    <a class="btn" href="{{ url_for('main.export_data', entity='relatorio', fmt='xlsx') }}">Exportar relatório (Excel)</a>
+  </div>
+</header>
+
+<section class="cards">
+  <article class="card"><span class="card-label">Clientes cadastrados</span><strong>{{ stats.clients }}</strong></article>
+  <article class="card"><span class="card-label">Clientes ativos</span><strong>{{ stats.active }}</strong></article>
+  <article class="card warn"><span class="card-label">Atendimentos pendentes</span><strong>{{ stats.pending }}</strong></article>
+  <article class="card"><span class="card-label">Receita concluída no mês</span><strong>{{ stats.revenue|brl }}</strong></article>
+</section>
+
+<section class="grid-2">
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Próximos atendimentos</h2>
+      <input class="search" type="search" placeholder="Filtrar a tabela…" data-filter="#upcoming">
+    </div>
+    <div class="table-wrap">
+      <table id="upcoming">
+        <thead><tr><th>Data</th><th>Cliente</th><th>Atendimento</th><th>Status</th></tr></thead>
+        <tbody>
+        {% for a in upcoming %}
+          <tr><td>{{ a.scheduled_at|dt }}</td><td>{{ a.client.name }}</td><td>{{ a.title }}</td>
+              <td><span class="badge {{ a.badge }}">{{ a.status }}</span></td></tr>
+        {% else %}
+          <tr><td colspan="4" class="empty">Nenhum atendimento futuro. <a href="{{ url_for('appointments.create') }}">Criar agendamento</a></td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><h2>Clientes por status</h2></div>
+    <ul class="bars">
+      {% for s, n in by_status.items() %}
+      <li><span>{{ s }}</span><div class="bar"><i style="width: {{ (n / total * 100)|round }}%"></i></div><b>{{ n }}</b></li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endblock %}

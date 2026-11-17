@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar agendamento' if editing else 'Novo agendamento' }}{% endblock %}
+{% block content %}
+<header class="page-head"><div><h1>{{ 'Editar agendamento' if editing else 'Novo agendamento' }}</h1></div></header>
+{% if not clients %}
+  <div class="panel empty">Cadastre um cliente antes de criar agendamentos. <a href="{{ url_for('clients.create') }}">Novo cliente</a></div>
+{% else %}
+<form method="post" class="panel form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  {% set sel = request.form.get('client_id', appt.client_id|string) %}
+  <div class="fields">
+    <label>Cliente *
+      <select name="client_id" required>
+        <option value="">Selecione…</option>
+        {% for c in clients %}<option value="{{ c.id }}" {{ 'selected' if c.id|string == sel }}>{{ c.name }}{{ ' — ' ~ c.company if c.company }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Título *<input name="title" required value="{{ request.form.get('title', appt.title or '') }}"></label>
+    <label>Data e hora *<input type="datetime-local" name="scheduled_at" required value="{{ request.form.get('scheduled_at', appt.scheduled_at.strftime('%Y-%m-%dT%H:%M')) }}"></label>
+    <label>Valor (R$)<input name="value" inputmode="decimal" value="{{ request.form.get('value', '%.2f'|format(appt.value or 0)) }}"></label>
+    <label>Status
+      <select name="status">{% for s in statuses %}<option {{ 'selected' if s == (request.form.get('status') or appt.status or 'Pendente') }}>{{ s }}</option>{% endfor %}</select>
+    </label>
+    <label class="full">Observações<textarea name="notes" rows="4">{{ request.form.get('notes', appt.notes or '') }}</textarea></label>
+  </div>
+  <div class="actions"><a class="btn" href="{{ url_for('appointments.index') }}">Cancelar</a><button class="btn primary" type="submit">Salvar agendamento</button></div>
+</form>
+{% endif %}
+{% endblock %}

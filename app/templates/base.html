@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Painel{% endblock %} · ClientFlow</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+{% block body %}
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">C</span> ClientFlow</div>
+    <nav>
+      <a href="{{ url_for('main.dashboard') }}" class="{{ 'on' if request.endpoint == 'main.dashboard' }}">Visão geral</a>
+      <a href="{{ url_for('clients.index') }}" class="{{ 'on' if request.blueprint == 'clients' }}">Clientes</a>
+      <a href="{{ url_for('appointments.index') }}" class="{{ 'on' if request.blueprint == 'appointments' }}">Agendamentos</a>
+    </nav>
+    <div class="side-foot">
+      <div class="who">{{ current_user.name }}</div>
+      <form method="post" action="{{ url_for('auth.logout') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn ghost-light" type="submit">Sair</button>
+      </form>
+    </div>
+  </aside>
+  <main class="content">
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in msgs %}<div class="flash {{ cat }}" role="status">{{ msg }}</div>{% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+{% endblock %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

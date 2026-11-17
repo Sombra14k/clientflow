@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Agendamentos{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div><h1>Agendamentos</h1><p class="sub">{{ appointments|length }} registro(s) encontrado(s).</p></div>
+  <div class="actions">
+    <a class="btn" href="{{ url_for('main.export_data', entity='agendamentos', fmt='csv') }}">Exportar CSV</a>
+    <a class="btn" href="{{ url_for('main.export_data', entity='agendamentos', fmt='xlsx') }}">Exportar Excel</a>
+    <a class="btn primary" href="{{ url_for('appointments.create') }}">Novo agendamento</a>
+  </div>
+</header>
+<form class="toolbar" method="get">
+  <input class="search" type="search" name="q" value="{{ q }}" placeholder="Buscar por cliente, empresa ou título">
+  <select name="status" onchange="this.form.submit()">
+    <option value="">Todos os status</option>
+    {% for s in statuses %}<option {{ 'selected' if s == status }}>{{ s }}</option>{% endfor %}
+  </select>
+  <button class="btn" type="submit">Buscar</button>
+</form>
+<div class="panel"><div class="table-wrap">
+<table>
+  <thead><tr><th>Data/hora</th><th>Cliente</th><th>Atendimento</th><th>Valor</th><th>Status</th><th class="right">Ações</th></tr></thead>
+  <tbody>
+  {% for a in appointments %}
+    <tr>
+      <td>{{ a.scheduled_at|dt }}</td><td><b>{{ a.client.name }}</b><br><small>{{ a.client.company or '' }}</small></td>
+      <td>{{ a.title }}</td><td>{{ a.value|brl }}</td>
+      <td><span class="badge {{ a.badge }}">{{ a.status }}</span></td>
+      <td class="right row-actions">
+        <a href="{{ url_for('appointments.edit', id=a.id) }}">Editar</a>
+        <form method="post" action="{{ url_for('appointments.delete', id=a.id) }}" data-confirm="Excluir este agendamento?">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="link danger" type="submit">Excluir</button>
+        </form>
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="6" class="empty">Nenhum agendamento encontrado. <a href="{{ url_for('appointments.create') }}">Criar agendamento</a></td></tr>
+  {% endfor %}
+  </tbody>
+</table></div></div>
+{% endblock %}
